@@ -2,3 +2,10 @@
 *.idea
 *target
 *.class
+*.classpath
+*.vscode
+*.project
+*.settings
+*target
+*.swp
+*.factorypath

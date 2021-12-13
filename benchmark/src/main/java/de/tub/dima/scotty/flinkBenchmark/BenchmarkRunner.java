@@ -25,9 +25,9 @@ public class BenchmarkRunner {
 
         //configPath = args[0];
         ArrayList<String> paths = new ArrayList<>();
-        //paths.add("/home/moczalla/Documents/Studium/PhD/firstPaper/running-scotty/benchmark/configurations/sliding_benchmark_flink.json");
-        paths.add("/home/moczalla/Documents/Studium/PhD/firstPaper/running-scotty/benchmark/configurations/sliding_benchmark_Scotty.json");
-        paths.add("/home/moczalla/Documents/Studium/PhD/firstPaper/running-scotty/benchmark/configurations/sliding_benchmark_Running.json");
+        //paths.add(System.getProperty("user.dir") + "/benchmark/configurations/sliding_benchmark_flink.json");
+        paths.add(System.getProperty("user.dir") + "/benchmark/configurations/sliding_benchmark_Scotty.json");
+        paths.add(System.getProperty("user.dir") + "/benchmark/configurations/sliding_benchmark_Running.json");
 
         for (String path : paths) {
             configPath = path;

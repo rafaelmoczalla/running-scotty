@@ -24,6 +24,4 @@ public class EagerSlice<InputType, ValueType> extends AbstractSlice<InputType, V
         super.addElement(element, ts);
         state.addElement(element);
     }
-
-
 }

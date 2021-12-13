@@ -31,7 +31,11 @@ public class FixedBandWindow implements ContextFreeWindow {
         return start;
     }
 
+    @Override
     public WindowMeasure getWindowMeasure() { return measure; }
+
+    @Override
+    public boolean isOverlapping() { return false; }
 
     @Override
     public long assignNextWindowStart(long position) {
@@ -48,11 +52,11 @@ public class FixedBandWindow implements ContextFreeWindow {
     }
 
     @Override
-    public void triggerWindows(WindowCollector aggregateWindows, long lastWatermark, long currentWatermark) {
+    public void triggerWindows(Integer id, boolean overlapping, WindowCollector aggregateWindows, long lastWatermark, long currentWatermark) {
         //triggers the window, if it started after lastWatermark and ended before currentWatermark
         long windowStart = getStart();
         if(lastWatermark <= windowStart+size && windowStart+size <= currentWatermark) {
-            aggregateWindows.trigger(windowStart, windowStart + size, measure);
+            aggregateWindows.trigger(id, overlapping, windowStart, windowStart + size, measure);
         }
     }
 

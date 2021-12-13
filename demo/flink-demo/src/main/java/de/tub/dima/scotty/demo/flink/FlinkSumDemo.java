@@ -25,7 +25,7 @@ public class FlinkSumDemo implements Serializable {
                 new KeyedScottyWindowOperator<>(new SumWindowFunction());
 
         processingFunction
-                .addWindow(new TumblingWindow(WindowMeasure.Time, 2000))
+                //.addWindow(new TumblingWindow(WindowMeasure.Time, 2000))
                 .addWindow(new SlidingWindow(WindowMeasure.Time, 5000,1000));
 
         stream

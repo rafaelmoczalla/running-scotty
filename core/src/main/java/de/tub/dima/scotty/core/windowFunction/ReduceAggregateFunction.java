@@ -1,7 +1,6 @@
 package de.tub.dima.scotty.core.windowFunction;
 
 
-@FunctionalInterface
 public interface ReduceAggregateFunction<InputType> extends AggregateFunction<InputType, InputType, InputType> {
 
     @Override

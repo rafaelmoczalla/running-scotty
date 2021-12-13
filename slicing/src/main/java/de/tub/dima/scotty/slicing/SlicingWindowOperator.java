@@ -27,10 +27,19 @@ public class SlicingWindowOperator<InputType> implements WindowOperator<InputTyp
     private final SliceManager<InputType> sliceManager;
     private final StreamSlicer slicer;
 
+    public SlicingWindowOperator(boolean running, StateFactory stateFactory) {
+        AggregationStore<InputType> aggregationStore = new LazyAggregateStore<>();
+        this.stateFactory = stateFactory;
+        this.windowManager = new WindowManager(running, stateFactory, aggregationStore);
+        this.sliceFactory = new SliceFactory<>(windowManager, stateFactory);
+        this.sliceManager = new SliceManager<>(sliceFactory, aggregationStore, windowManager);
+        this.slicer = new StreamSlicer(sliceManager, windowManager);
+    }
+
     public SlicingWindowOperator(StateFactory stateFactory) {
         AggregationStore<InputType> aggregationStore = new LazyAggregateStore<>();
         this.stateFactory = stateFactory;
-        this.windowManager = new WindowManager(stateFactory, aggregationStore);
+        this.windowManager = new WindowManager(false, stateFactory, aggregationStore);
         this.sliceFactory = new SliceFactory<>(windowManager, stateFactory);
         this.sliceManager = new SliceManager<>(sliceFactory, aggregationStore, windowManager);
         this.slicer = new StreamSlicer(sliceManager, windowManager);

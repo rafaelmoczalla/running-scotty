@@ -15,6 +15,11 @@ public class Mean implements AggregateFunction<Integer, Pair, Integer> {
     }
 
     @Override
+    public Pair invert(Pair partialAggregate1, Pair partialAggregate2) {
+        return new Pair(partialAggregate1.sum - partialAggregate2.sum, partialAggregate1.count - partialAggregate2.count);
+    }
+
+    @Override
     public Integer lower(Pair aggregate) {
         return aggregate.getResult();
     }

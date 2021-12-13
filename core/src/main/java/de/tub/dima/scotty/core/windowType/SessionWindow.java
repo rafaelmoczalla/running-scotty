@@ -30,6 +30,11 @@ public class SessionWindow implements ForwardContextAware {
     }
 
     @Override
+    public boolean isOverlapping() {
+        return false;
+    }
+
+    @Override
     public SessionContext createContext() {
         return new SessionContext();
     }
@@ -104,10 +109,10 @@ public class SessionWindow implements ForwardContextAware {
         }
 
         @Override
-        public void triggerWindows(WindowCollector aggregateWindows, long lastWatermark, long currentWatermark) {
+        public void triggerWindows(Integer id, boolean overlapping, WindowCollector aggregateWindows, long lastWatermark, long currentWatermark) {
             ActiveWindow session = getWindow(0);
             while (session.getEnd() + gap < currentWatermark) {
-                aggregateWindows.trigger(session.getStart(), session.getEnd() + gap, measure);
+                aggregateWindows.trigger(id, overlapping, session.getStart(), session.getEnd() + gap, measure);
                 removeWindow(0);
                 if (hasActiveWindows())
                     return;
@@ -115,7 +120,10 @@ public class SessionWindow implements ForwardContextAware {
             }
         }
 
-
+        @Override
+        public boolean isOverlapping() {
+            return false;
+        }
     }
 
     @Override

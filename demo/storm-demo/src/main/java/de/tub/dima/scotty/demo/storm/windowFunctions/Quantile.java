@@ -21,6 +21,11 @@ public class Quantile implements AggregateFunction<Integer, QuantileTreeMap, Int
     }
 
     @Override
+    public QuantileTreeMap invert(QuantileTreeMap partialAggregate1, QuantileTreeMap partialAggregate2) {
+        return null;
+    }
+
+    @Override
     public QuantileTreeMap liftAndCombine(QuantileTreeMap partialAggregate, Integer inputTuple) {
         partialAggregate.addValue(inputTuple);
         return partialAggregate;

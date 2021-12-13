@@ -24,14 +24,20 @@ public class LazyAggregateStoreTest {
     public void setup() {
         aggregationStore = new LazyAggregateStore<>();
         stateFactory = new StateFactoryMock();
-        windowManager = new WindowManager(stateFactory, aggregationStore);
+        windowManager = new WindowManager(true, stateFactory, aggregationStore);
         sliceFactory = new SliceFactory<>(windowManager, stateFactory);
         windowManager.addAggregation(new ReduceAggregateFunction<Integer>() {
             @Override
             public Integer combine(Integer partialAggregate1, Integer partialAggregate2) {
                 return partialAggregate1 + partialAggregate2;
             }
+
+            @Override
+            public Integer invert(Integer currentAggregate, Integer element) {
+                return currentAggregate - element;
+            }
         });
+
     }
 
     @Test
@@ -114,8 +120,8 @@ public class LazyAggregateStoreTest {
 
 
         List<AggregateWindowState> window = new ArrayList<>();
-        window.add(new AggregateWindowState(10, 40, WindowMeasure.Time, stateFactory, windowManager.getAggregations()));
-        window.add(new AggregateWindowState(10, 20, WindowMeasure.Time, stateFactory, windowManager.getAggregations()));
+        window.add(new AggregateWindowState(1, true, 10, 40, WindowMeasure.Time, stateFactory, windowManager.getAggregations()));
+        window.add(new AggregateWindowState(2, true, 10, 20, WindowMeasure.Time, stateFactory, windowManager.getAggregations()));
 
 
     }

@@ -1,7 +1,7 @@
 {
   "name" : "sliding_window_benchmark",
   "runtime" : 30,
-  "throughput": 1600000,
+  "throughput": 4000000,
   "windowConfigurations": [
     [
       "Sliding(60000,60000)"
@@ -29,7 +29,7 @@
     ]
   ],
   "configurations": [
-    "Flink"
+    "Running"
   ],
   "sessionConfig": {
     "gapCount": 10,

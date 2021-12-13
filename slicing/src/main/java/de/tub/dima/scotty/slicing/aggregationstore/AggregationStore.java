@@ -3,6 +3,7 @@ package de.tub.dima.scotty.slicing.aggregationstore;
 import de.tub.dima.scotty.slicing.*;
 import de.tub.dima.scotty.slicing.slice.Slice;
 import de.tub.dima.scotty.slicing.state.*;
+import de.tub.dima.scotty.state.StateFactory;
 
 public interface AggregationStore<InputType> {
 
@@ -57,20 +58,21 @@ public interface AggregationStore<InputType> {
     /**
      * Generates the window aggregates.
      * On every @{@link AggregateWindowState} the aggregated value is set.
-     * @param aggregateWindows definition of the requested window
+     * @param aggregateWindows definition of the requested window.
+     * @param running if True running optimization is performed.
      * @param minTs startTimestamp of the earliest window.
      * @param maxTs endTimestamp of the latest window
      * @param minCount
      * @param maxCount
      */
-    void aggregate(WindowManager.AggregationWindowCollector aggregateWindows, long minTs, long maxTs, long minCount, long maxCount);
+    void aggregate(WindowManager.AggregationWindowCollector aggregateWindows, boolean running, long maxOptLateness, long minTs, long maxTs, long minCount, long maxCount);
 
     /**
      * Add a new Slice at a specific index
      * @param index
      * @param newSlice
      */
-    void addSlice(int index, Slice newSlice);
+    void addSlice(int index, Slice<InputType, ?> newSlice);
 
     /**
      * Merging two slices A and B happens in three steps:

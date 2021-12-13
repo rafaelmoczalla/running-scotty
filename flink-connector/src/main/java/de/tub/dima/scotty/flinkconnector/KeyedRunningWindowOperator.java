@@ -13,7 +13,7 @@ import org.apache.flink.util.*;
 
 import java.util.*;
 
-public class KeyedScottyWindowOperator<Key, InputType, FinalAggregateType> extends KeyedProcessFunction<Key, InputType, AggregateWindow<FinalAggregateType>> {
+public class KeyedRunningWindowOperator<Key, InputType, FinalAggregateType> extends KeyedProcessFunction<Key, InputType, AggregateWindow<FinalAggregateType>> {
 
 
     private MemoryStateFactory stateFactory;
@@ -24,7 +24,7 @@ public class KeyedScottyWindowOperator<Key, InputType, FinalAggregateType> exten
     private final List<Window> windows;
     private long allowedLateness = 1;
 
-    public KeyedScottyWindowOperator(AggregateFunction<InputType, ?, FinalAggregateType> windowFunction) {
+    public KeyedRunningWindowOperator(AggregateFunction<InputType, ?, FinalAggregateType> windowFunction) {
         this.windowFunction = windowFunction;
         this.windows = new ArrayList<>();
     }
@@ -38,7 +38,7 @@ public class KeyedScottyWindowOperator<Key, InputType, FinalAggregateType> exten
     }
 
     public SlicingWindowOperator<InputType> initWindowOperator() {
-        SlicingWindowOperator<InputType> slicingWindowOperator = new SlicingWindowOperator<>(stateFactory);
+        SlicingWindowOperator<InputType> slicingWindowOperator = new SlicingWindowOperator<>(true, stateFactory);
         for (Window window : windows) {
             slicingWindowOperator.addWindowAssigner(window);
         }
@@ -89,12 +89,12 @@ public class KeyedScottyWindowOperator<Key, InputType, FinalAggregateType> exten
      * For example {@link SlidingWindow} or {@link TumblingWindow}
      * @param window the new window definition
      */
-    public KeyedScottyWindowOperator addWindow(Window window) {
+    public KeyedRunningWindowOperator addWindow(Window window) {
         windows.add(window);
         return this;
     }
 
-    public KeyedScottyWindowOperator allowedLateness(Time time){
+    public KeyedRunningWindowOperator allowedLateness(Time time){
         this.allowedLateness = time.toMilliseconds();
         return this;
     }

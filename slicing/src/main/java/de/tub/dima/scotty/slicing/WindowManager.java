@@ -17,11 +17,13 @@ public class WindowManager {
 
     private final AggregationStore aggregationStore;
     private final StateFactory stateFactory;
+    private final boolean running;
     private boolean hasContextAwareWindows = false;
     private boolean hasFixedWindows;
     private boolean hasCountMeasure;
     private long minSessionTimeout;
     private long maxLateness = 1000;
+    private long maxOptLateness = 0;
     private long maxFixedWindowSize = 0;
     private final List<ContextFreeWindow> contextFreeWindows = new ArrayList<>();
     private final List<WindowContext> contextAwareWindows = new ArrayList<>();
@@ -32,7 +34,8 @@ public class WindowManager {
     private long lastCount = 0;
     private boolean isSessionWindowCase;
 
-    public WindowManager(StateFactory stateFactory, AggregationStore aggregationStore) {
+    public WindowManager(boolean running, StateFactory stateFactory, AggregationStore aggregationStore) {
+        this.running = running;
         this.stateFactory = stateFactory;
         this.aggregationStore = aggregationStore;
     }
@@ -71,11 +74,13 @@ public class WindowManager {
         }
 
         if (!windows.isEmpty()) {
-            this.aggregationStore.aggregate(windows, minTs, maxTs, minCount, maxCount);
+            this.aggregationStore.aggregate(windows, (running && windowFunctions.get(0) instanceof InvertibleAggregateFunction), maxOptLateness, minTs, maxTs, minCount, maxCount);
         }
+
         this.lastWatermark = watermarkTs;
         this.lastCount = currentCount;
-        clearAfterWatermark(watermarkTs - maxLateness);
+        clearAfterWatermark(watermarkTs - Math.max(maxLateness, maxOptLateness));
+
         return windows.aggregationStores;
     }
 
@@ -96,23 +101,27 @@ public class WindowManager {
 
 
     private void assignContextAwareWindows(long watermarkTs, AggregationWindowCollector windows) {
-        for (WindowContext context : contextAwareWindows) {
-            context.triggerWindows(windows, lastWatermark, watermarkTs);
+        for (int i = 0; i < contextAwareWindows.size(); i++) {
+            WindowContext context = contextAwareWindows.get(i);
+
+            context.triggerWindows(context.hashCode(), context.isOverlapping(), windows, lastWatermark, watermarkTs);
         }
     }
 
     private void assignContextFreeWindows(long watermarkTs, WindowCollector windowCollector) {
 
-        for (ContextFreeWindow window : contextFreeWindows) {
+        for (int i = 0; i < contextFreeWindows.size(); i++) {
+            ContextFreeWindow window = contextFreeWindows.get(i);
+
             if (window.getWindowMeasure() == Time)
-                window.triggerWindows(windowCollector, lastWatermark, watermarkTs);
+                window.triggerWindows(window.hashCode(), window.isOverlapping(), windowCollector, lastWatermark, watermarkTs);
             else if (window.getWindowMeasure() == Count) {
                 int sliceIndex = this.aggregationStore.findSliceIndexByTimestamp(watermarkTs);
                 Slice slice = this.aggregationStore.getSlice(sliceIndex);
                 if (slice.getTLast() >= watermarkTs && sliceIndex > 0)
                     slice = this.aggregationStore.getSlice(sliceIndex - 1);
                 long cend = slice.getCLast();
-                window.triggerWindows(windowCollector, lastCount, cend + 1);
+                window.triggerWindows(window.hashCode(), window.isOverlapping(), windowCollector, lastCount, cend + 1);
             }
         }
     }
@@ -121,7 +130,10 @@ public class WindowManager {
     public void addWindowAssigner(Window window) {
         if (window instanceof ContextFreeWindow) {
             contextFreeWindows.add((ContextFreeWindow) window);
-            maxFixedWindowSize = Math.max(maxFixedWindowSize, ((ContextFreeWindow) window).clearDelay());
+            long winMaxFixedWindowSize = ((ContextFreeWindow) window).clearDelay();
+            if (running && window instanceof SlidingWindow)
+                maxOptLateness = Math.max(maxOptLateness, ((SlidingWindow) window).getSlide());
+            maxFixedWindowSize = Math.max(maxFixedWindowSize, winMaxFixedWindowSize);
             hasFixedWindows = true;
         }
         if (window instanceof ForwardContextAware) {
@@ -206,8 +218,8 @@ public class WindowManager {
         private final List<AggregateWindow> aggregationStores;
 
 
-        public void trigger(long start, long end, WindowMeasure measure) {
-            AggregateWindowState aggWindow = new AggregateWindowState(start, end, measure, stateFactory, windowFunctions);
+        public void trigger(Integer id, boolean overlapping, long start, long end, WindowMeasure measure) {
+            AggregateWindowState aggWindow = new AggregateWindowState(id, overlapping, start, end, measure, stateFactory, windowFunctions);
             this.aggregationStores.add(aggWindow);
         }
 

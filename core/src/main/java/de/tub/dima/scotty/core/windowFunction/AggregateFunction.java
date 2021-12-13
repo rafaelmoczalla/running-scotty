@@ -55,4 +55,12 @@ public interface AggregateFunction<InputType, PartialAggregateType, FinalAggrega
      */
     FinalAggregateType lower(PartialAggregateType aggregate);
 
+    /**
+     * Computs the remaining aggregate that combined with partialAggregate2 equals
+     * partialAggregate1.
+     * @param partialAggregate1 the combined PartialAggregate.
+     * @param partialAggregate2 the first PartialAggregate.
+     * @return the second PartialAggregate.
+     */
+    PartialAggregateType invert(PartialAggregateType partialAggregate1, PartialAggregateType partialAggregate2);
 }

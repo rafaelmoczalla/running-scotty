@@ -35,14 +35,20 @@ public class SliceFactoryTest {
     public void setup() {
         aggregationStore = new LazyAggregateStore<>();
         stateFactory = new StateFactoryMock();
-        windowManager = new WindowManager(stateFactory, aggregationStore);
+        windowManager = new WindowManager(true, stateFactory, aggregationStore);
         sliceFactory = new SliceFactory<>(windowManager, stateFactory);
         windowManager.addAggregation(new ReduceAggregateFunction<Integer>() {
             @Override
             public Integer combine(Integer partialAggregate1, Integer partialAggregate2) {
                 return partialAggregate1 + partialAggregate2;
             }
+
+            @Override
+            public Integer invert(Integer currentAggregate, Integer element) {
+                return currentAggregate - element;
+            }
         });
+
     }
 
     /**
@@ -135,6 +141,11 @@ public class SliceFactoryTest {
         @Override
         public WindowMeasure getWindowMeasure() {
             return windowMeasure;
+        }
+
+        @Override
+        public boolean isOverlapping() {
+            return true;
         }
     }
 

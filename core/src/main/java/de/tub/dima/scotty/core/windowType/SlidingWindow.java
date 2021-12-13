@@ -1,7 +1,6 @@
 package de.tub.dima.scotty.core.windowType;
 
 import de.tub.dima.scotty.core.*;
-import de.tub.dima.scotty.core.*;
 
 public class SlidingWindow implements ContextFreeWindow {
 
@@ -36,23 +35,33 @@ public class SlidingWindow implements ContextFreeWindow {
         return measure;
     }
 
+    @Override
+    public boolean isOverlapping() {
+        if (this.slide < this.size)
+            return true;
+
+        return false;
+    }
+
 
     @Override
     public long assignNextWindowStart(long recordStamp) {
         return recordStamp + getSlide() - (recordStamp) % getSlide();
     }
 
-    public static long getWindowStartWithOffset(long timestamp, long windowSize) {
-        return timestamp - (timestamp  + windowSize) % windowSize;
+    public static long getWindowStart(long timestamp, long windowSize, long windowSlide) {
+        return timestamp - ((timestamp  + windowSlide) % windowSlide) - windowSize;
     }
 
     @Override
-    public void triggerWindows(WindowCollector collector, long lastWatermark, long currentWatermark) {
-        long lastStart  = getWindowStartWithOffset(currentWatermark, slide);
+    public void triggerWindows(Integer id, boolean overlapping, WindowCollector collector, long lastWatermark, long currentWatermark) {
+        long lastStart  = getWindowStart(currentWatermark, size, slide);
+        long firstStart = getWindowStart(lastWatermark, size, slide) + slide;
 
-        for (long windowStart = lastStart; windowStart + size > lastWatermark; windowStart -= slide) {
+        //for (long windowStart = lastStart; windowStart + size > lastWatermark; windowStart -= slide) {
+        for (long windowStart = firstStart; windowStart <= lastStart; windowStart += slide) {
             if (windowStart>=0 && windowStart + size <= currentWatermark + 1)
-                collector.trigger(windowStart, windowStart + size, measure);
+                collector.trigger(id, overlapping, windowStart, windowStart + size, measure);
         }
     }
 

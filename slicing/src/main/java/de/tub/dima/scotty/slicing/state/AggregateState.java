@@ -49,6 +49,14 @@ public class AggregateState<InputType> implements Serializable {
         }
     }
 
+    public void invert(AggregateState<InputType> otherAggState) {
+        if (this.isMergeable(otherAggState)) {
+            for (int i = 0; i < otherAggState.aggregateValueStates.size(); i++) {
+                this.aggregateValueStates.get(i).invert(otherAggState.aggregateValueStates.get(i));
+            }
+        }
+    }
+
     private boolean isMergeable(AggregateState otherAggState) {
         return otherAggState.aggregateValueStates.size() <= this.aggregateValueStates.size();
     }

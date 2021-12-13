@@ -33,6 +33,11 @@ public class Quantile implements AggregateFunction<
     }
 
     @Override
+    public KV<Integer, QuantileTreeMap> invert(KV<Integer, QuantileTreeMap> partialAggregate1, KV<Integer, QuantileTreeMap> partialAggregate2) {
+        return null;
+    }
+
+    @Override
     public KV<Integer, QuantileTreeMap> liftAndCombine(KV<Integer, QuantileTreeMap> partialAggregate, KV<Integer, Integer> inputTuple) {
         partialAggregate.getValue().addValue(Math.toIntExact(inputTuple.getValue()));
         return partialAggregate;

@@ -26,15 +26,20 @@ public class TumblingWindow implements ContextFreeWindow {
     }
 
     @Override
+    public boolean isOverlapping() {
+        return false;
+    }
+
+    @Override
     public long assignNextWindowStart(long recordStamp) {
         return recordStamp + getSize() - (recordStamp) % getSize();
     }
 
     @Override
-    public void triggerWindows(WindowCollector aggregateWindows, long lastWatermark, long currentWatermark) {
+    public void triggerWindows(Integer id, boolean overlapping, WindowCollector aggregateWindows, long lastWatermark, long currentWatermark) {
         long lastStart = lastWatermark - ((lastWatermark + size) % size);
         for (long windowStart = lastStart; windowStart + size <= currentWatermark; windowStart += size) {
-            aggregateWindows.trigger(windowStart, windowStart + size, measure);
+            aggregateWindows.trigger(id, overlapping, windowStart, windowStart + size, measure);
         }
     }
 

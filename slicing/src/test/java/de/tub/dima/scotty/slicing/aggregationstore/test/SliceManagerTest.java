@@ -39,7 +39,7 @@ public class SliceManagerTest {
     public void setup() {
         aggregationStore = new LazyAggregateStore<>();
         stateFactory = new StateFactoryMock();
-        windowManager = new WindowManager(stateFactory, aggregationStore);
+        windowManager = new WindowManager(true, stateFactory, aggregationStore);
         sliceFactory = new SliceFactory<>(windowManager, stateFactory);
         sliceManager = new SliceManager(sliceFactory, aggregationStore, windowManager);
         windowManager.addAggregation(new ReduceAggregateFunction<Integer>() {
@@ -47,7 +47,13 @@ public class SliceManagerTest {
             public Integer combine(Integer partialAggregate1, Integer partialAggregate2) {
                 return partialAggregate1 + partialAggregate2;
             }
+
+            @Override
+            public Integer invert(Integer currentAggregate, Integer element) {
+                return currentAggregate - element;
+            }
         });
+
     }
 
     /**
@@ -349,21 +355,31 @@ public class SliceManagerTest {
             }
 
             @Override
-            public void triggerWindows(WindowCollector aggregateWindows, long lastWatermark, long currentWatermark) {
+            public void triggerWindows(Integer id, boolean overlapping, WindowCollector aggregateWindows, long lastWatermark, long currentWatermark) {
                 ActiveWindow w = getWindow(0);
                 while (w.getEnd() <= currentWatermark) {
-                    aggregateWindows.trigger(w.getStart(), w.getEnd() , windowMeasure);
+                    aggregateWindows.trigger(id, overlapping, w.getStart(), w.getEnd() , windowMeasure);
                     removeWindow(0);
                     if (hasActiveWindows())
                         return;
                     w = getWindow(0);
                 }
             }
+
+            @Override
+            public boolean isOverlapping() {
+                return true;
+            }
         }
 
         @Override
         public WindowMeasure getWindowMeasure() {
             return windowMeasure;
+        }
+
+        @Override
+        public boolean isOverlapping() {
+            return true;
         }
     }
 

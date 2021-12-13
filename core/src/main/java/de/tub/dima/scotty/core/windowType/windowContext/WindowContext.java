@@ -1,7 +1,7 @@
 package de.tub.dima.scotty.core.windowType.windowContext;
 
 import de.tub.dima.scotty.core.*;
-import de.tub.dima.scotty.core.*;
+import de.tub.dima.scotty.core.windowFunction.*;
 
 import java.io.*;
 import java.util.*;
@@ -72,7 +72,9 @@ public abstract class WindowContext<Tuple> implements Serializable {
 
     public abstract long assignNextWindowStart(long position);
 
-    public abstract void triggerWindows(WindowCollector aggregateWindows, long lastWatermark, long currentWatermark);
+    public abstract void triggerWindows(Integer id, boolean overlapping, WindowCollector aggregateWindows, long lastWatermark, long currentWatermark);
+
+    public abstract boolean isOverlapping();
 
     public class ActiveWindow implements Comparable<ActiveWindow> {
         private long start;

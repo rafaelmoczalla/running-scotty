@@ -16,6 +16,11 @@ public class Mean implements AggregateFunction<KV<Integer, Integer>, KV<Integer,
         return KV.of(partialAggregate1.getKey(), new Pair(partialAggregate1.getValue().sum + partialAggregate2.getValue().sum,
                 partialAggregate1.getValue().count + partialAggregate2.getValue().count));
     }
+    @Override
+    public KV<Integer, Pair> invert(KV<Integer, Pair> partialAggregate1, KV<Integer, Pair> partialAggregate2) {
+        return KV.of(partialAggregate1.getKey(), new Pair(partialAggregate1.getValue().sum - partialAggregate2.getValue().sum,
+                partialAggregate1.getValue().count - partialAggregate2.getValue().count));
+    }
 
     @Override
     public KV<Integer, Integer> lower(KV<Integer, Pair> aggregate) {

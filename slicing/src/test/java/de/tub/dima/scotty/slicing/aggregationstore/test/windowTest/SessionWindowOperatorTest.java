@@ -22,7 +22,17 @@ public class SessionWindowOperatorTest {
 
     @Test
     public void inOrderTest() {
-        slicingWindowOperator.addWindowFunction((ReduceAggregateFunction<Integer>) (currentAggregate, element) -> currentAggregate + element);
+        slicingWindowOperator.addWindowFunction(new ReduceAggregateFunction<Integer>() {
+            @Override
+            public Integer combine(Integer currentAggregate, Integer element) {
+                return currentAggregate + element;
+            }
+
+            @Override
+            public Integer invert(Integer currentAggregate, Integer element) {
+                return currentAggregate - element;
+            }
+        });
         slicingWindowOperator.addWindowAssigner(new SessionWindow(WindowMeasure.Time, 10));
         slicingWindowOperator.processElement(1, 1);
         slicingWindowOperator.processElement(2, 19);
@@ -45,7 +55,17 @@ public class SessionWindowOperatorTest {
 
     @Test
     public void inOrderTestClean() {
-        slicingWindowOperator.addWindowFunction((ReduceAggregateFunction<Integer>) (currentAggregate, element) -> currentAggregate + element);
+        slicingWindowOperator.addWindowFunction(new ReduceAggregateFunction<Integer>() {
+            @Override
+            public Integer combine(Integer currentAggregate, Integer element) {
+                return currentAggregate + element;
+            }
+
+            @Override
+            public Integer invert(Integer currentAggregate, Integer element) {
+                return currentAggregate - element;
+            }
+        });
         slicingWindowOperator.addWindowAssigner(new SessionWindow(WindowMeasure.Time, 10000));
         slicingWindowOperator.processElement(1, 1000);
         slicingWindowOperator.processElement(2, 19000);
@@ -68,7 +88,17 @@ public class SessionWindowOperatorTest {
 
     @Test
     public void inOrderTest2() {
-        slicingWindowOperator.addWindowFunction((ReduceAggregateFunction<Integer>) (currentAggregate, element) -> currentAggregate + element);
+        slicingWindowOperator.addWindowFunction(new ReduceAggregateFunction<Integer>() {
+            @Override
+            public Integer combine(Integer currentAggregate, Integer element) {
+                return currentAggregate + element;
+            }
+
+            @Override
+            public Integer invert(Integer currentAggregate, Integer element) {
+                return currentAggregate - element;
+            }
+        });
         slicingWindowOperator.addWindowAssigner(new SessionWindow(WindowMeasure.Time, 10));
         slicingWindowOperator.processElement(1, 0);
         slicingWindowOperator.processElement(2, 0);
@@ -90,7 +120,17 @@ public class SessionWindowOperatorTest {
 
     @Test
     public void outOfOrderTestSimpleInsert() {
-        slicingWindowOperator.addWindowFunction((ReduceAggregateFunction<Integer>) (currentAggregate, element) -> currentAggregate + element);
+        slicingWindowOperator.addWindowFunction(new ReduceAggregateFunction<Integer>() {
+            @Override
+            public Integer combine(Integer currentAggregate, Integer element) {
+                return currentAggregate + element;
+            }
+
+            @Override
+            public Integer invert(Integer currentAggregate, Integer element) {
+                return currentAggregate - element;
+            }
+        });
         slicingWindowOperator.addWindowAssigner(new SessionWindow(WindowMeasure.Time, 10));
         slicingWindowOperator.processElement(1, 1);
 
@@ -106,7 +146,17 @@ public class SessionWindowOperatorTest {
 
     @Test
     public void outOfOrderTestRightInsert() {
-        slicingWindowOperator.addWindowFunction((ReduceAggregateFunction<Integer>) (currentAggregate, element) -> currentAggregate + element);
+        slicingWindowOperator.addWindowFunction(new ReduceAggregateFunction<Integer>() {
+            @Override
+            public Integer combine(Integer currentAggregate, Integer element) {
+                return currentAggregate + element;
+            }
+
+            @Override
+            public Integer invert(Integer currentAggregate, Integer element) {
+                return currentAggregate - element;
+            }
+        });
         slicingWindowOperator.addWindowAssigner(new SessionWindow(WindowMeasure.Time, 10));
         slicingWindowOperator.processElement(1, 1);
 
@@ -123,7 +173,17 @@ public class SessionWindowOperatorTest {
 
     @Test
     public void outOfOrderTestLeftInsert() {
-        slicingWindowOperator.addWindowFunction((ReduceAggregateFunction<Integer>) (currentAggregate, element) -> currentAggregate + element);
+        slicingWindowOperator.addWindowFunction(new ReduceAggregateFunction<Integer>() {
+            @Override
+            public Integer combine(Integer currentAggregate, Integer element) {
+                return currentAggregate + element;
+            }
+
+            @Override
+            public Integer invert(Integer currentAggregate, Integer element) {
+                return currentAggregate - element;
+            }
+        });
         slicingWindowOperator.addWindowAssigner(new SessionWindow(WindowMeasure.Time, 10));
         slicingWindowOperator.processElement(1, 1);
 
@@ -143,7 +203,18 @@ public class SessionWindowOperatorTest {
 
     @Test
     public void outOfOrderTestSplitSlice() {
-        slicingWindowOperator.addWindowFunction((ReduceAggregateFunction<Integer>) (currentAggregate, element) -> currentAggregate + element);
+
+        slicingWindowOperator.addWindowFunction(new ReduceAggregateFunction<Integer>() {
+            @Override
+            public Integer combine(Integer currentAggregate, Integer element) {
+                return currentAggregate + element;
+            }
+
+            @Override
+            public Integer invert(Integer currentAggregate, Integer element) {
+                return currentAggregate - element;
+            }
+        });
         slicingWindowOperator.addWindowAssigner(new SessionWindow(WindowMeasure.Time, 10));
         slicingWindowOperator.processElement(1, 1);
 
@@ -163,7 +234,17 @@ public class SessionWindowOperatorTest {
 
     @Test
     public void outOfOrderTestMergeSlice() {
-        slicingWindowOperator.addWindowFunction((ReduceAggregateFunction<Integer>) (currentAggregate, element) -> currentAggregate + element);
+        slicingWindowOperator.addWindowFunction(new ReduceAggregateFunction<Integer>() {
+            @Override
+            public Integer combine(Integer currentAggregate, Integer element) {
+                return currentAggregate + element;
+            }
+
+            @Override
+            public Integer invert(Integer currentAggregate, Integer element) {
+                return currentAggregate - element;
+            }
+        });
         slicingWindowOperator.addWindowAssigner(new SessionWindow(WindowMeasure.Time, 10));
         slicingWindowOperator.processElement(1, 7);
 
@@ -181,7 +262,17 @@ public class SessionWindowOperatorTest {
 
     @Test
     public void outOfOrderCombinedSessionTumblingMegeSession() {
-        slicingWindowOperator.addWindowFunction((ReduceAggregateFunction<Integer>) (currentAggregate, element) -> currentAggregate + element);
+        slicingWindowOperator.addWindowFunction(new ReduceAggregateFunction<Integer>() {
+            @Override
+            public Integer combine(Integer currentAggregate, Integer element) {
+                return currentAggregate + element;
+            }
+
+            @Override
+            public Integer invert(Integer currentAggregate, Integer element) {
+                return currentAggregate - element;
+            }
+        });
         slicingWindowOperator.addWindowAssigner(new SessionWindow(WindowMeasure.Time, 10));
         slicingWindowOperator.addWindowAssigner(new TumblingWindow(WindowMeasure.Time, 40));
         slicingWindowOperator.processElement(1, 7);
@@ -205,7 +296,17 @@ public class SessionWindowOperatorTest {
 
     @Test
     public void outOfOrderCombinedSessionMultiSession() {
-        slicingWindowOperator.addWindowFunction((ReduceAggregateFunction<Integer>) (currentAggregate, element) -> currentAggregate + element);
+        slicingWindowOperator.addWindowFunction(new ReduceAggregateFunction<Integer>() {
+            @Override
+            public Integer combine(Integer currentAggregate, Integer element) {
+                return currentAggregate + element;
+            }
+
+            @Override
+            public Integer invert(Integer currentAggregate, Integer element) {
+                return currentAggregate - element;
+            }
+        });
         slicingWindowOperator.addWindowAssigner(new SessionWindow(WindowMeasure.Time, 10));
         slicingWindowOperator.addWindowAssigner(new SessionWindow(WindowMeasure.Time, 5));
         //slicingWindowOperator.processElement(1, 7);

@@ -31,6 +31,11 @@ public class QuantileWindowFunction implements AggregateFunction<Tuple2<Integer,
     }
 
     @Override
+    public Tuple2<Integer, QuantileTreeMap> invert(Tuple2<Integer, QuantileTreeMap> partialAggregate1, Tuple2<Integer, QuantileTreeMap> partialAggregate2) {
+        return null;
+    }
+
+    @Override
     public Tuple2<Integer, QuantileTreeMap> liftAndCombine(Tuple2<Integer, QuantileTreeMap> partialAggregate, Tuple2<Integer, Integer> inputTuple) {
         partialAggregate.f1.addValue(inputTuple.f1);
         return partialAggregate;

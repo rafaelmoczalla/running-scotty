@@ -31,6 +31,11 @@ public class SlicingWindowOperatorBenchmark {
             public Integer combine(Integer partialAggregate1, Integer partialAggregate2) {
                 return partialAggregate1 + partialAggregate2;
             }
+
+            @Override
+            public Integer invert(Integer partialAggregate1, Integer partialAggregate2) {
+                return partialAggregate1 - partialAggregate2;
+            }
         });
     }
 

@@ -23,61 +23,71 @@ public class BenchmarkRunner {
 
     public static void main(String[] args) throws Exception {
 
-        configPath = args[0];
+        //configPath = args[0];
+        ArrayList<String> paths = new ArrayList<>();
+        //paths.add("/home/moczalla/Documents/Studium/PhD/firstPaper/running-scotty/benchmark/configurations/sliding_benchmark_flink.json");
+        paths.add("/home/moczalla/Documents/Studium/PhD/firstPaper/running-scotty/benchmark/configurations/sliding_benchmark_Scotty.json");
+        paths.add("/home/moczalla/Documents/Studium/PhD/firstPaper/running-scotty/benchmark/configurations/sliding_benchmark_Running.json");
 
-        BenchmarkConfig config = loadConfig();
+        for (String path : paths) {
+            configPath = path;
 
-        PrintWriter resultWriter = new PrintWriter(new FileOutputStream(new File("result_" + config.name + ".txt"),true));
+            BenchmarkConfig config = loadConfig();
 
-        Configuration conf = new Configuration();
-        final StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(conf);
+            PrintWriter resultWriter = new PrintWriter(new FileOutputStream(new File("result_" + config.name + ".txt"),true));
 
-        List<Tuple2<Long, Long>> gaps = Collections.emptyList();
-        if (config.sessionConfig != null)
-            gaps = generateSessionGaps(config.sessionConfig.gapCount, (int) TimeMeasure.minutes(2).toMilliseconds(), config.sessionConfig.minGapTime, config.sessionConfig.maxGapTime);
+            Configuration conf = new Configuration();
+            final StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(conf);
 
-        System.out.println(gaps);
-        Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+            List<Tuple2<Long, Long>> gaps = Collections.emptyList();
+            if (config.sessionConfig != null)
+                gaps = generateSessionGaps(config.sessionConfig.gapCount, (int) TimeMeasure.minutes(2).toMilliseconds(), config.sessionConfig.minGapTime, config.sessionConfig.maxGapTime);
+
+            System.out.println(gaps);
+            Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 
 
-        for (List<String> windows : config.windowConfigurations) {
-            for (String benchConfig : config.configurations) {
-                for (String agg : config.aggFunctions) {
-                    System.out.println("\n\n\n\n\n\n\n");
+            for (List<String> windows : config.windowConfigurations) {
+                for (String benchConfig : config.configurations) {
+                    for (String agg : config.aggFunctions) {
+                        System.out.println("\n\n\n\n\n\n\n");
 
-                    System.out.println("Start Benchmark " + benchConfig + " with windows " + config.windowConfigurations );
-                    System.out.println("\n\n\n\n\n\n\n");
-                    // [Bucket, Naive, Slicing_Lazy, Slicing_Heap]
-                    switch (benchConfig) {
-                        case "Slicing": {
-                            new BenchmarkJob(getAssigners(windows), env, TimeMeasure.seconds(config.runtime).toMilliseconds(), config.throughput, gaps);
-                            break;
+                        System.out.println("Start Benchmark " + benchConfig + " with windows " + config.windowConfigurations );
+                        System.out.println("\n\n\n\n\n\n\n");
+                        // [Bucket, Naive, Slicing_Lazy, Slicing_Heap]
+                        switch (benchConfig) {
+                            case "Running": {
+                                new RunningBenchmarkJob(getAssigners(windows), env, TimeMeasure.seconds(config.runtime).toMilliseconds(), config.throughput, gaps);
+                                break;
+                            }
+                            case "Slicing": {
+                                new BenchmarkJob(getAssigners(windows), env, TimeMeasure.seconds(config.runtime).toMilliseconds(), config.throughput, gaps);
+                                break;
+                            }
+                            case "Flink": {
+                                new FlinkBenchmarkJob(getAssigners(windows), env, TimeMeasure.seconds(config.runtime).toMilliseconds(), config.throughput, gaps);
+                                break;
+                            }
                         }
-                        case "Flink": {
-                            new FlinkBenchmarkJob(getAssigners(windows), env, TimeMeasure.seconds(config.runtime).toMilliseconds(), config.throughput, gaps);
-                            break;
-                        }
+
+                        System.out.println(ThroughputStatistics.getInstance().toString());
+
+
+                        resultWriter.append(benchConfig  + "\t" + windows + " \t" + agg + " \t" +
+                            ThroughputStatistics.getInstance().mean() + "\t");
+                        resultWriter.append("\n");
+                        resultWriter.flush();
+                        ThroughputStatistics.getInstance().clean();
+
+                        Thread.sleep(seconds(10).toMilliseconds());
                     }
-
-                    System.out.println(ThroughputStatistics.getInstance().toString());
-
-
-                    resultWriter.append(benchConfig  + "\t" + windows + " \t" + agg + " \t" +
-                           ThroughputStatistics.getInstance().mean() + "\t");
-                    resultWriter.append("\n");
-                    resultWriter.flush();
-                    ThroughputStatistics.getInstance().clean();
-
-                    Thread.sleep(seconds(10).toMilliseconds());
                 }
+
+
             }
 
-
+            resultWriter.close();
         }
-
-        resultWriter.close();
-
-
     }
 
     private static List<Window> getAssigners(List<String> config) {

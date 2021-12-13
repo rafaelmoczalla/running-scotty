@@ -8,4 +8,9 @@ public class Max implements ReduceAggregateFunction<Integer> {
     public Integer combine(Integer partialAggregate1, Integer partialAggregate2) {
         return Math.max(partialAggregate1,partialAggregate2);
     }
+
+    @Override
+    public Integer invert(Integer partialAggregate1, Integer partialAggregate2) {
+        return null;
+    }
 }

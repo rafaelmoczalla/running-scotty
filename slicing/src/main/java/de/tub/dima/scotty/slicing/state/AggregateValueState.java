@@ -64,8 +64,14 @@ public class AggregateValueState<Input, Partial, Output> {
             Partial merged = this.aggregateFunction.combine(this.partialAggregateState.get(), otherValueState.get());
             this.partialAggregateState.set(merged);
         }
+    }
 
-
+    public void invert(AggregateValueState<Input, Partial, Output> otherAggState) {
+        ValueState<Partial> otherValueState = otherAggState.partialAggregateState;
+        if (!this.partialAggregateState.isEmpty() && !otherValueState.isEmpty()) {
+            Partial inverted = this.aggregateFunction.invert(this.partialAggregateState.get(), otherValueState.get());
+            this.partialAggregateState.set(inverted);
+        }
     }
 
     public boolean hasValue(){

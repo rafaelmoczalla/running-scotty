@@ -30,6 +30,11 @@ public class AggregationStoreBenchmark {
             public Integer combine(Integer partialAggregate1, Integer partialAggregate2) {
                 return partialAggregate1 + partialAggregate2;
             }
+
+            @Override
+            public Integer invert(Integer partialAggregate1, Integer partialAggregate2) {
+                return partialAggregate1 - partialAggregate2;
+            }
         };
         this.aggregationState = new AggregateState(memoryStateFactory, Collections.singletonList(wf));
         this.aggregationStateInline  = new AggregationStateInline(memoryStateFactory);

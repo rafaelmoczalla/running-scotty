@@ -10,6 +10,8 @@ public interface AggregateWindow<T> extends Serializable {
 
     public WindowMeasure getMeasure();
 
+    public Integer getId();
+
     public long getStart();
 
     public long getEnd();

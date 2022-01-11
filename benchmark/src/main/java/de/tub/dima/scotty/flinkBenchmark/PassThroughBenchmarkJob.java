@@ -13,8 +13,8 @@ import org.apache.flink.streaming.api.windowing.windows.*;
 
 import java.util.*;
 
-public class FlinkBenchmarkJob {
-    public FlinkBenchmarkJob(List<Window> assigners, StreamExecutionEnvironment env, long runtime, int throughput, List<Tuple2<Long, Long>> gaps) {
+public class PassThroughBenchmarkJob {
+    public PassThroughBenchmarkJob(List<Window> assigners, StreamExecutionEnvironment env, long runtime, int throughput, List<Tuple2<Long, Long>> gaps) {
         Map<String, String> configMap = new HashMap<>();
         ParameterTool parameters = ParameterTool.fromMap(configMap);
 
@@ -31,25 +31,9 @@ public class FlinkBenchmarkJob {
         final SingleOutputStreamOperator<Tuple4<String, Integer, Long, Long>> timestampsAndWatermarks = messageStream
                 .assignTimestampsAndWatermarks(new BenchmarkJob.TimestampsAndWatermarks());
 
-        KeyedStream<Tuple4<String, Integer, Long, Long>, Tuple> keyedStream = timestampsAndWatermarks
-                .keyBy(0);
-
-        for (Window w : assigners) {
-
-            if (w instanceof TumblingWindow) {
-                WindowedStream<Tuple4<String, Integer, Long, Long>, Tuple, TimeWindow> tw = keyedStream.timeWindow(Time.seconds(((TumblingWindow) w).getSize()));
-
-                tw.sum(1).addSink(new DiscardingSink<>());
-            }
-            if (w instanceof SlidingWindow) {
-                WindowedStream<Tuple4<String, Integer, Long, Long>, Tuple, TimeWindow> tw = keyedStream.timeWindow(Time.milliseconds(((SlidingWindow) w).getSize()), Time.milliseconds(((SlidingWindow) w).getSlide()));
-
-                tw.sum(1).addSink(new DiscardingSink<>());
-            }
-
-
-        }
-
+        timestampsAndWatermarks
+                .keyBy(0)
+                .addSink(new DiscardingSink<>());
 
         try {
             env.execute();

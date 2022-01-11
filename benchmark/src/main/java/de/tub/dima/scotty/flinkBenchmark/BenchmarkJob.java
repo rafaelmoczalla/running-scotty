@@ -10,6 +10,7 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.AssignerWithPeriodicWatermarks;
+import org.apache.flink.streaming.api.functions.sink.DiscardingSink;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.streaming.api.watermark.Watermark;
 
@@ -61,13 +62,7 @@ public class BenchmarkJob {
 		timestampsAndWatermarks
 				.keyBy(0)
 				.process(windowOperator)
-				.addSink(new SinkFunction() {
-
-					@Override
-					public void invoke(final Object value) throws Exception {
-						//System.out.println(value);
-					}
-				});
+				.addSink(new DiscardingSink<>());
 
 		try {
 			env.execute();

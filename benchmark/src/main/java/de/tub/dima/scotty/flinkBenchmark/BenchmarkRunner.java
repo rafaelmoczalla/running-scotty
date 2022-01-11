@@ -25,7 +25,7 @@ public class BenchmarkRunner {
 
         //configPath = args[0];
         ArrayList<String> paths = new ArrayList<>();
-        //paths.add(System.getProperty("user.dir") + "/benchmark/configurations/sliding_benchmark_flink.json");
+        paths.add(System.getProperty("user.dir") + "/benchmark/configurations/sliding_benchmark_PassThrough.json");
         paths.add(System.getProperty("user.dir") + "/benchmark/configurations/sliding_benchmark_Scotty.json");
         paths.add(System.getProperty("user.dir") + "/benchmark/configurations/sliding_benchmark_Running.json");
 
@@ -60,12 +60,16 @@ public class BenchmarkRunner {
                                 new RunningBenchmarkJob(getAssigners(windows), env, TimeMeasure.seconds(config.runtime).toMilliseconds(), config.throughput, gaps);
                                 break;
                             }
-                            case "Slicing": {
+                            case "Scotty": {
                                 new BenchmarkJob(getAssigners(windows), env, TimeMeasure.seconds(config.runtime).toMilliseconds(), config.throughput, gaps);
                                 break;
                             }
                             case "Flink": {
                                 new FlinkBenchmarkJob(getAssigners(windows), env, TimeMeasure.seconds(config.runtime).toMilliseconds(), config.throughput, gaps);
+                                break;
+                            }
+                            case "PassThrough": {
+                                new PassThroughBenchmarkJob(getAssigners(windows), env, TimeMeasure.seconds(config.runtime).toMilliseconds(), config.throughput, gaps);
                                 break;
                             }
                         }

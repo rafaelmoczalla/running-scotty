@@ -1,6 +1,6 @@
 {
   "name" : "sliding_window_benchmark",
-  "runtime" : 30,
+  "runtime" : 360,
   "throughput": 4000000,
   "windowConfigurations": [
     [
